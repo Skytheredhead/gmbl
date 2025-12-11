@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useRef, useLayoutEffect } from "react";
+import { useEffect, useMemo, useState, useRef, useLayoutEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { glassPanelClass, primaryButtonGradient } from "../theme";
 import { useWalletBalance } from "../hooks/useSupabaseWallet";
@@ -177,7 +177,7 @@ export default function BlackjackPage() {
       }
     });
     ch.on("broadcast", { event: "lobby" }, () => {
-      router.push(`/gmbl/lobby?code=${c}`);
+    router.push(`/lobby?code=${c}`);
     });
     ch.on("presence", { event: "sync" }, () => {
       const state = ch.presenceState();
@@ -206,7 +206,7 @@ export default function BlackjackPage() {
     return () => {
       ch.unsubscribe();
     };
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const update = () => {
@@ -220,11 +220,13 @@ export default function BlackjackPage() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
+  const othersCount = Object.keys(others).length;
+
   useLayoutEffect(() => {
     if (contentRef.current) {
       setContentHeight(contentRef.current.offsetHeight);
     }
-  }, [phase, player.length, dealer.length, Object.keys(others).length, scale]);
+  }, [dealer.length, othersCount, phase, player.length, scale]);
 
   useEffect(() => {
     if (phase === "bet") {
@@ -252,15 +254,46 @@ export default function BlackjackPage() {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [money]);
+  }, [displayMoney, money]);
 
-  function broadcastHand(hand: Card[]) {
-    if (!channel) return;
-    const codes = hand.map(
-      (c) => `${c.rank}${{ "♠": "S", "♥": "H", "♦": "D", "♣": "C" }[c.suit]}`
-    );
-    channel.send({ type: "broadcast", event: "hand", payload: { name, hand: codes } });
-  }
+  const broadcastHand = useCallback(
+    (hand: Card[]) => {
+      if (!channel) return;
+      const codes = hand.map(
+        (c) => `${c.rank}${{ "♠": "S", "♥": "H", "♦": "D", "♣": "C" }[c.suit]}`
+      );
+      channel.send({ type: "broadcast", event: "hand", payload: { name, hand: codes } });
+    },
+    [channel, name]
+  );
+
+  const deal = useCallback(
+    (amt: number) => {
+      const nextRound = round + 1;
+      setRound(nextRound);
+      const seedBase = `${code}-${nextRound}`;
+      const pDeck = createDeck(`${seedBase}-${name}`);
+      const dDeck = createDeck(`${seedBase}-dealer`);
+    const ph = [parseCard(pDeck.shift()!), parseCard(pDeck.shift()!)];
+    const dh = [parseCard(dDeck.shift()!), parseCard(dDeck.shift()!)];
+    setPlayerDeck(pDeck);
+    setDealerDeck(dDeck);
+    setPlayer(ph);
+    setDealer(dh);
+    setBet(amt);
+    setPhase("player");
+    setCanDouble(true);
+    setSelectedQuick(null);
+    setSelfStatus("playing");
+      setStatuses((s) => {
+        const res: Record<string, "playing" | "stood" | "bust"> = {};
+        Object.keys(s).forEach((k) => (res[k] = "playing"));
+        return res;
+      });
+      broadcastHand(ph);
+    },
+    [broadcastHand, code, name, round]
+  );
 
   useEffect(() => {
     if (pendingBet === null) return;
@@ -278,32 +311,7 @@ export default function BlackjackPage() {
       deal(pendingBet);
       setPendingBet(null);
     }
-  }, [pendingBet, betsPlaced, players, isMultiplayer]);
-
-  const deal = (amt: number) => {
-    const nextRound = round + 1;
-    setRound(nextRound);
-    const seedBase = `${code}-${nextRound}`;
-    const pDeck = createDeck(`${seedBase}-${name}`);
-    const dDeck = createDeck(`${seedBase}-dealer`);
-    const ph = [parseCard(pDeck.shift()!), parseCard(pDeck.shift()!)];
-    const dh = [parseCard(dDeck.shift()!), parseCard(dDeck.shift()!)];
-    setPlayerDeck(pDeck);
-    setDealerDeck(dDeck);
-    setPlayer(ph);
-    setDealer(dh);
-    setBet(amt);
-    setPhase("player");
-    setCanDouble(true);
-    setSelectedQuick(null);
-    setSelfStatus("playing");
-    setStatuses((s) => {
-      const res: Record<string, "playing" | "stood" | "bust"> = {};
-      Object.keys(s).forEach((k) => (res[k] = "playing"));
-      return res;
-    });
-    broadcastHand(ph);
-  };
+  }, [betsPlaced, deal, isMultiplayer, pendingBet, players]);
 
   const placeBet = () => {
     const amt = parseInt(betInput, 10);
@@ -394,10 +402,11 @@ export default function BlackjackPage() {
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  const resolve = async (hand: Card[], playerBusted = false) => {
-    setPhase("dealer");
-    let dhand = dealer.slice();
-    let ddeck = dealerDeck.slice();
+  const resolve = useCallback(
+    async (hand: Card[], playerBusted = false) => {
+      setPhase("dealer");
+      let dhand = dealer.slice();
+      let ddeck = dealerDeck.slice();
     await sleep(800); // allow hidden card flip
     while (handTotal(dhand) < 17) {
       dhand.push(parseCard(ddeck.shift()!));
@@ -425,7 +434,9 @@ export default function BlackjackPage() {
     setMessage(msg);
     setPhase("result");
     setBet(0);
-  };
+    },
+    [bet, dealer, dealerDeck, setMoney]
+  );
 
   useEffect(() => {
     if (
@@ -434,7 +445,7 @@ export default function BlackjackPage() {
     ) {
       resolve(player, selfStatus === "bust");
     }
-  }, [selfStatus, statuses, player]);
+  }, [player, resolve, selfStatus, statuses]);
 
   const playAgain = () => {
     setBetDelay(true);
@@ -457,10 +468,10 @@ export default function BlackjackPage() {
 
   const backToLobby = () => {
     channel?.send({ type: "broadcast", event: "lobby" });
-    router.push(`/gmbl/lobby?code=${code}`);
+    router.push(`/lobby?code=${code}`);
   };
 
-  const leave = () => router.push("/gmbl");
+  const leave = () => router.push("/");
 
   return (
     <motion.div
@@ -473,7 +484,7 @@ export default function BlackjackPage() {
           onClick={() => setConfirm(true)}
           className="text-3xl font-black tracking-tight text-white transition hover:text-cyan-200"
         >
-          <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">/gmbl</span>
+            <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">gmbl</span>
         </button>
         {isHost && (
           <button

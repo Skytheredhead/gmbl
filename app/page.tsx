@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { glassPanelClass, primaryButtonGradient } from "./theme";
 
-// Canvas-safe, dependency-free home screen for /gmbl
+// Canvas-safe, dependency-free home screen for gmbl
 // - No next/router or framer-motion
 // - Keeps: title, segmented join code, multiplayer toggle, 3 game cards
 // - Adds: data-testid hooks for easy testing
@@ -16,11 +16,11 @@ export default function GmblHome() {
 
   const canJoin = code.length === 4;
 
-  const navigate = (path: string) => {
+  const navigate = useCallback((path: string) => {
     if (typeof window !== "undefined") {
       window.location.href = path;
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!showHoldemModal) return;
@@ -43,11 +43,11 @@ export default function GmblHome() {
     return undefined;
   }, [showHoldemModal]);
 
-  const onJoin = () => {
+  const onJoin = useCallback(() => {
     if (!canJoin) return;
     // join existing lobby by code
-    navigate(`/gmbl/lobby?code=${code}`);
-  };
+    navigate(`/lobby?code=${code}`);
+  }, [canJoin, code, navigate]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -56,7 +56,7 @@ export default function GmblHome() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [code]);
+  }, [code, onJoin]);
 
   return (
     <main className="relative min-h-screen overflow-hidden px-3 pb-24 text-white sm:px-6">
@@ -68,7 +68,7 @@ export default function GmblHome() {
           <header className="lg:col-span-12">
             <div className="text-center">
               <h1 className="select-none text-[2.9rem] font-black leading-tight tracking-tight text-white drop-shadow-[0_0_24px_rgba(148,163,184,0.4)] sm:text-[3.2rem] lg:text-[3.4rem]">
-                <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">/gmbl</span>
+                <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">gmbl</span>
               </h1>
             </div>
           </header>
@@ -106,7 +106,7 @@ export default function GmblHome() {
           onClose={() => setShowHoldemModal(false)}
           onSelect={(count) => {
             setShowHoldemModal(false);
-            navigate(`/gmbl/holdem?bots=${count}`);
+            navigate(`/holdem?bots=${count}`);
           }}
           firstOptionRef={firstHoldemOptionRef}
         />
@@ -195,25 +195,25 @@ function JoinCard({
 const games: ReadonlyArray<GameCardConfig> = [
   {
     label: "Multiplayer",
-    path: "/gmbl/lobby",
+    path: "/lobby",
     subtext: "Create a room and invite friends",
     className: "bg-gradient-to-br from-cyan-400/25 via-emerald-400/20 to-sky-500/25",
   },
   {
     label: "Blackjack",
-    path: "/gmbl/blackjack",
+    path: "/blackjack",
     subtext: "Hit, stand, and stack your chips",
     className: "bg-gradient-to-br from-indigo-400/25 via-sky-400/20 to-cyan-400/25",
   },
   {
     label: "Roulette",
-    path: "/gmbl/roulette",
+    path: "/roulette",
     subtext: "Bet big and watch the wheel",
     className: "bg-gradient-to-br from-emerald-400/25 via-teal-400/20 to-sky-400/25",
   },
   {
     label: "Baccarat",
-    path: "/gmbl/baccarat",
+    path: "/baccarat",
     subtext: "Player or banker? Choose your side",
     className: "bg-gradient-to-br from-sky-400/25 via-indigo-400/20 to-cyan-400/22",
   },
@@ -308,7 +308,7 @@ function HoldemModal({
         <button
           onClick={onClose}
           className="absolute right-4 top-4 rounded-full border border-white/20 bg-white/10 px-2 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/60 transition hover:bg-white/20 hover:text-white"
-          aria-label="Close Hold'em setup"
+          aria-label="Close Hold&apos;em setup"
         >
           ×
         </button>
@@ -317,9 +317,9 @@ function HoldemModal({
             <h2 id="holdem-modal-title" className="text-2xl font-semibold tracking-tight text-white">
               How many bots?
             </h2>
-            <p className="mt-2 text-sm text-white/70">
-              Choose your table size to launch Texas Hold'em.
-            </p>
+              <p className="mt-2 text-sm text-white/70">
+                Choose your table size to launch Texas Hold&apos;em.
+              </p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {counts.map((count, idx) => (

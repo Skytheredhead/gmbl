@@ -1,8 +1,8 @@
-# /gmbl favicon guidance
+# gmbl favicon guidance
 
-To add a favicon that only applies to the `/gmbl` section of the app, drop the artwork inside the route directory so Next.js can automatically serve it when that path is loaded.
+To add a favicon for the standalone gmbl site, drop the artwork inside the root app directory so Next.js can automatically serve it for every route.
 
-- **Folder:** `app/gmbl/`
+- **Folder:** `app/`
 - **Required file:** `icon.png`
 - **Recommended size:** 32×32 px (transparent background, square canvas)
 

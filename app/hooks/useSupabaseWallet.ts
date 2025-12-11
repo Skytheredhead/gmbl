@@ -275,7 +275,7 @@ export function useWalletBalance({
       cancelled = true;
       clearTimeout(timeout);
     };
-  }, [balance, persistWalletRecord]);
+  }, [balance, mode, persistWalletRecord]);
 
   const refresh = useCallback(async () => {
     if (typeof window === 'undefined') return;

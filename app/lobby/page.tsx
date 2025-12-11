@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { glassPanelClass, primaryButtonGradient } from "../theme";
 import { createClient } from "@supabase/supabase-js";
 import { useWalletBalance } from "../hooks/useSupabaseWallet";
@@ -100,7 +100,7 @@ export default function GmblLobby() {
     };
   }, [joined, name, code]);
 
-  const onJoin = () => {
+  const onJoin = useCallback(() => {
     const trimmed = name.trim();
     if (trimmed) {
       sessionStorage.setItem("gmbl-name", trimmed);
@@ -108,7 +108,7 @@ export default function GmblLobby() {
       sessionStorage.setItem("gmbl-code", code);
       setJoined(true);
     }
-  };
+  }, [code, isHost, name]);
 
   useEffect(() => {
     if (joined) return;
@@ -117,7 +117,7 @@ export default function GmblLobby() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [joined, name]);
+  }, [joined, name, onJoin]);
 
   const canStart = isHost && joined && selectedGame && players.length > 1;
 
@@ -142,12 +142,12 @@ export default function GmblLobby() {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [wallet]);
+  }, [displayWallet, wallet]);
 
   return (
     <main className="relative min-h-screen overflow-hidden px-4 pb-24 pt-24 text-white sm:px-6">
       <a
-        href="/gmbl"
+        href="/"
         className="absolute left-6 top-6 text-3xl font-black tracking-tight text-white transition hover:text-cyan-200"
       >
         <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">gmbl</span>
@@ -325,25 +325,25 @@ interface Game {
 const games: ReadonlyArray<Game> = [
   {
     label: "Blackjack",
-    path: "/gmbl/blackjack",
+    path: "/blackjack",
     blurb: "Hit or stand with friends",
     accent: "from-indigo-500/30 via-sky-400/20 to-cyan-300/25",
   },
   {
     label: "Roulette",
-    path: "/gmbl/roulette",
+    path: "/roulette",
     blurb: "Spin the wheel together",
     accent: "from-emerald-400/20 via-teal-400/20 to-sky-400/25",
   },
   {
     label: "Baccarat",
-    path: "/gmbl/baccarat",
+    path: "/baccarat",
     blurb: "Choose banker or player",
     accent: "from-sky-400/20 via-indigo-400/20 to-cyan-400/25",
   },
   {
     label: "Hold'em",
-    path: "/gmbl/holdem",
+    path: "/holdem",
     blurb: "Texas hold'em showdowns",
     accent: "from-teal-400/25 via-sky-400/25 to-indigo-500/25",
   },

@@ -97,9 +97,9 @@ export default function BaccaratPage() {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [wallet]);
+  }, [displayWallet, wallet]);
 
-  const leave = () => router.push("/gmbl");
+  const leave = () => router.push("/");
 
   const deal = () => {
     const wager = parseInt(betInput, 10);
@@ -179,7 +179,7 @@ export default function BaccaratPage() {
         onClick={() => setConfirm(true)}
         className="absolute left-6 top-8 text-3xl font-black tracking-tight text-white transition hover:text-cyan-200 md:left-12 md:top-12"
       >
-        <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">/gmbl</span>
+        <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">gmbl</span>
       </button>
       <h2 className="text-3xl font-semibold text-sky-200 drop-shadow-[0_0_18px_rgba(56,189,248,0.35)]">Baccarat</h2>
       <div className="absolute right-6 top-8 flex flex-col items-end gap-2 text-right text-white/70 md:right-12 md:top-12">
