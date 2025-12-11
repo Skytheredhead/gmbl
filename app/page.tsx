@@ -308,7 +308,7 @@ function HoldemModal({
         <button
           onClick={onClose}
           className="absolute right-4 top-4 rounded-full border border-white/20 bg-white/10 px-2 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white/60 transition hover:bg-white/20 hover:text-white"
-          aria-label="Close Hold'em setup"
+          aria-label="Close Hold&apos;em setup"
         >
           ×
         </button>
@@ -317,9 +317,9 @@ function HoldemModal({
             <h2 id="holdem-modal-title" className="text-2xl font-semibold tracking-tight text-white">
               How many bots?
             </h2>
-            <p className="mt-2 text-sm text-white/70">
-              Choose your table size to launch Texas Hold'em.
-            </p>
+              <p className="mt-2 text-sm text-white/70">
+                Choose your table size to launch Texas Hold&apos;em.
+              </p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {counts.map((count, idx) => (

@@ -682,4 +682,6 @@ const RouletteGame = forwardRef<RouletteGameHandle, {
   );
 });
 
+RouletteGame.displayName = "RouletteGame";
+
 export default RouletteGame;
