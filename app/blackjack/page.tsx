@@ -264,6 +264,34 @@ export default function BlackjackPage() {
     channel.send({ type: "broadcast", event: "hand", payload: { name, hand: codes } });
   }
 
+  const deal = useCallback(
+    (amt: number) => {
+      const nextRound = round + 1;
+      setRound(nextRound);
+      const seedBase = `${code}-${nextRound}`;
+      const pDeck = createDeck(`${seedBase}-${name}`);
+      const dDeck = createDeck(`${seedBase}-dealer`);
+    const ph = [parseCard(pDeck.shift()!), parseCard(pDeck.shift()!)];
+    const dh = [parseCard(dDeck.shift()!), parseCard(dDeck.shift()!)];
+    setPlayerDeck(pDeck);
+    setDealerDeck(dDeck);
+    setPlayer(ph);
+    setDealer(dh);
+    setBet(amt);
+    setPhase("player");
+    setCanDouble(true);
+    setSelectedQuick(null);
+    setSelfStatus("playing");
+      setStatuses((s) => {
+        const res: Record<string, "playing" | "stood" | "bust"> = {};
+        Object.keys(s).forEach((k) => (res[k] = "playing"));
+        return res;
+      });
+      broadcastHand(ph);
+    },
+    [broadcastHand, code, name, round]
+  );
+
   useEffect(() => {
     if (pendingBet === null) return;
 
@@ -281,31 +309,6 @@ export default function BlackjackPage() {
       setPendingBet(null);
     }
   }, [betsPlaced, deal, isMultiplayer, pendingBet, players]);
-
-  const deal = (amt: number) => {
-    const nextRound = round + 1;
-    setRound(nextRound);
-    const seedBase = `${code}-${nextRound}`;
-    const pDeck = createDeck(`${seedBase}-${name}`);
-    const dDeck = createDeck(`${seedBase}-dealer`);
-    const ph = [parseCard(pDeck.shift()!), parseCard(pDeck.shift()!)];
-    const dh = [parseCard(dDeck.shift()!), parseCard(dDeck.shift()!)];
-    setPlayerDeck(pDeck);
-    setDealerDeck(dDeck);
-    setPlayer(ph);
-    setDealer(dh);
-    setBet(amt);
-    setPhase("player");
-    setCanDouble(true);
-    setSelectedQuick(null);
-    setSelfStatus("playing");
-    setStatuses((s) => {
-      const res: Record<string, "playing" | "stood" | "bust"> = {};
-      Object.keys(s).forEach((k) => (res[k] = "playing"));
-      return res;
-    });
-    broadcastHand(ph);
-  };
 
   const placeBet = () => {
     const amt = parseInt(betInput, 10);
@@ -429,7 +432,7 @@ export default function BlackjackPage() {
     setPhase("result");
     setBet(0);
     },
-    [bet, dealer, dealerDeck]
+    [bet, dealer, dealerDeck, setMoney]
   );
 
   useEffect(() => {

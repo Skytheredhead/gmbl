@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { glassPanelClass, primaryButtonGradient } from "./theme";
 
@@ -43,11 +43,11 @@ export default function GmblHome() {
     return undefined;
   }, [showHoldemModal]);
 
-  const onJoin = () => {
+  const onJoin = useCallback(() => {
     if (!canJoin) return;
     // join existing lobby by code
     navigate(`/lobby?code=${code}`);
-  };
+  }, [canJoin, code, navigate]);
 
   // Keyboard shortcuts
   useEffect(() => {

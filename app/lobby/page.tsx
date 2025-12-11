@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { glassPanelClass, primaryButtonGradient } from "../theme";
 import { createClient } from "@supabase/supabase-js";
 import { useWalletBalance } from "../hooks/useSupabaseWallet";
@@ -100,7 +100,7 @@ export default function GmblLobby() {
     };
   }, [joined, name, code]);
 
-  const onJoin = () => {
+  const onJoin = useCallback(() => {
     const trimmed = name.trim();
     if (trimmed) {
       sessionStorage.setItem("gmbl-name", trimmed);
@@ -108,7 +108,7 @@ export default function GmblLobby() {
       sessionStorage.setItem("gmbl-code", code);
       setJoined(true);
     }
-  };
+  }, [code, isHost, name]);
 
   useEffect(() => {
     if (joined) return;

@@ -1,6 +1,14 @@
 "use client";
 
-import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle, ReactNode } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  ReactNode,
+  useCallback,
+} from "react";
 
 /**
  * RouletteZeroToTen — V22
@@ -231,7 +239,7 @@ const RouletteGame = forwardRef<RouletteGameHandle, {
   const pocketAngleForIndex = (idx:number, stepAng:number)=> (wheelAngleRef.current + (idx+0.5)*stepAng);
 
   // Draw wheel — thicker outer rim, pockets extended under it; numbers outward; ring/hub flush
-  const drawWheel = (ctx:CanvasRenderingContext2D)=>{
+  const drawWheel = useCallback((ctx:CanvasRenderingContext2D)=>{
     const {CX,CY,OUTER,INNER,BALL_R,W,H} = dimsRef.current;
     ctx.clearRect(0,0,W,H); ctx.save(); ctx.translate(CX,CY);
 
@@ -294,7 +302,7 @@ const RouletteGame = forwardRef<RouletteGameHandle, {
     ctx.fillStyle=g; ctx.beginPath(); ctx.arc(bx,by,BALL_R,0,Math.PI*2); ctx.fill();
 
     ctx.restore();
-  };
+  },[]);
 
   // Animation loop with proper states
   useEffect(()=>{
