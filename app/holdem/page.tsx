@@ -735,7 +735,7 @@ export default function HoldemPage() {
       if (typeof window !== "undefined") {
         window.alert("Please choose between 1 and 3 bots for Hold'em.");
       }
-      router.replace("/gmbl");
+      router.replace("/");
     }
   }, [invalidBots, router]);
 
@@ -1259,10 +1259,10 @@ export default function HoldemPage() {
       <div className="relative z-10 min-h-screen">
         <div className="absolute left-6 top-8 flex items-center gap-4 md:left-12 md:top-12">
           <Link
-            href="/gmbl"
+            href="/"
             className="text-3xl font-black tracking-tight text-white transition hover:text-cyan-200"
           >
-            <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">/gmbl</span>
+            <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">gmbl</span>
           </Link>
         </div>
         <div className="absolute right-6 top-8 flex items-center gap-3 md:right-12 md:top-12">
@@ -1665,7 +1665,7 @@ export default function HoldemPage() {
                 Refill balance
               </button>
               <Link
-                href="/gmbl"
+                href="/"
                 className="rounded-full border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white/80 transition hover:bg-white/20 hover:text-white"
               >
                 Leave table
@@ -1730,7 +1730,7 @@ function PokerCard({
 
   const back = (
     <div className="relative flex h-full w-full items-center justify-center rounded-2xl border border-white/10 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.2),rgba(15,23,42,0.9))] text-white/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-      <span className="tracking-tight text-white/50">/gmbl</span>
+      <span className="tracking-tight text-white/50">gmbl</span>
     </div>
   );
 

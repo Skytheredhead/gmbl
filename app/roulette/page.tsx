@@ -79,7 +79,7 @@ export default function RoulettePage() {
       setBetsPlaced({});
     });
     ch.on("broadcast", { event: "lobby" }, () => {
-      router.push(`/gmbl/lobby?code=${c}`);
+      router.push(`/lobby?code=${c}`);
     });
     ch.on("presence", { event: "sync" }, () => {
       const state = ch.presenceState();
@@ -116,10 +116,10 @@ export default function RoulettePage() {
   const backToLobby = () => {
     if (!isMultiplayer) return;
     channel?.send({ type: "broadcast", event: "lobby" });
-    router.push(`/gmbl/lobby?code=${code}`);
+    router.push(`/lobby?code=${code}`);
   };
 
-  const leave = () => router.push("/gmbl");
+  const leave = () => router.push("/");
 
   const allBet = isMultiplayer ? players.length > 0 && players.every((p) => betsPlaced[p]) : true;
   const waiting = isMultiplayer ? players.filter((p) => !betsPlaced[p]).length : 0;
@@ -211,7 +211,7 @@ export default function RoulettePage() {
           onClick={leave}
           className="text-3xl font-black tracking-tight text-white transition hover:text-cyan-200"
         >
-          <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">/gmbl</span>
+          <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">gmbl</span>
         </button>
         {showLobbyButton && (
           <button

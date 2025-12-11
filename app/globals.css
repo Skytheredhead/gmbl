@@ -1,0 +1,48 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-slate-950 text-white antialiased;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.gmbl-bg {
+  background: radial-gradient(1200px 600px at 50% -10%, rgba(56, 189, 248, 0.45), transparent),
+    radial-gradient(900px 700px at 8% 90%, rgba(45, 212, 191, 0.32), transparent),
+    radial-gradient(900px 700px at 92% 92%, rgba(129, 140, 248, 0.32), transparent);
+}
+
+.gmbl-card {
+  @apply border border-white/10 bg-white/10 shadow-[0_30px_120px_rgba(15,23,42,0.45)] backdrop-blur-xl;
+}
+
+.gmbl-input {
+  @apply rounded-2xl border border-white/15 bg-white/5 px-4 py-3 text-white placeholder:text-white/45 focus:outline-none focus:ring-2 focus:ring-cyan-300/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)];
+}
+
+.gmbl-overlay {
+  @apply fixed inset-0 bg-slate-950/80 backdrop-blur;
+}
+
+.card {
+  perspective: 1200px;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}

@@ -177,7 +177,7 @@ export default function BlackjackPage() {
       }
     });
     ch.on("broadcast", { event: "lobby" }, () => {
-      router.push(`/gmbl/lobby?code=${c}`);
+    router.push(`/lobby?code=${c}`);
     });
     ch.on("presence", { event: "sync" }, () => {
       const state = ch.presenceState();
@@ -457,10 +457,10 @@ export default function BlackjackPage() {
 
   const backToLobby = () => {
     channel?.send({ type: "broadcast", event: "lobby" });
-    router.push(`/gmbl/lobby?code=${code}`);
+    router.push(`/lobby?code=${code}`);
   };
 
-  const leave = () => router.push("/gmbl");
+  const leave = () => router.push("/");
 
   return (
     <motion.div
@@ -473,7 +473,7 @@ export default function BlackjackPage() {
           onClick={() => setConfirm(true)}
           className="text-3xl font-black tracking-tight text-white transition hover:text-cyan-200"
         >
-          <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">/gmbl</span>
+            <span className="bg-gradient-to-br from-white via-sky-100 to-cyan-200 bg-clip-text text-transparent">gmbl</span>
         </button>
         {isHost && (
           <button
