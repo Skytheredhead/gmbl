@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useRef, useLayoutEffect } from "react";
+import { useEffect, useMemo, useState, useRef, useLayoutEffect, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { glassPanelClass, primaryButtonGradient } from "../theme";
 import { useWalletBalance } from "../hooks/useSupabaseWallet";
@@ -206,7 +206,7 @@ export default function BlackjackPage() {
     return () => {
       ch.unsubscribe();
     };
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const update = () => {
@@ -220,11 +220,13 @@ export default function BlackjackPage() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
+  const othersCount = Object.keys(others).length;
+
   useLayoutEffect(() => {
     if (contentRef.current) {
       setContentHeight(contentRef.current.offsetHeight);
     }
-  }, [phase, player.length, dealer.length, Object.keys(others).length, scale]);
+  }, [dealer.length, othersCount, phase, player.length, scale]);
 
   useEffect(() => {
     if (phase === "bet") {
@@ -252,7 +254,7 @@ export default function BlackjackPage() {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [money]);
+  }, [displayMoney, money]);
 
   function broadcastHand(hand: Card[]) {
     if (!channel) return;
@@ -278,7 +280,7 @@ export default function BlackjackPage() {
       deal(pendingBet);
       setPendingBet(null);
     }
-  }, [pendingBet, betsPlaced, players, isMultiplayer]);
+  }, [betsPlaced, deal, isMultiplayer, pendingBet, players]);
 
   const deal = (amt: number) => {
     const nextRound = round + 1;
@@ -394,10 +396,11 @@ export default function BlackjackPage() {
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  const resolve = async (hand: Card[], playerBusted = false) => {
-    setPhase("dealer");
-    let dhand = dealer.slice();
-    let ddeck = dealerDeck.slice();
+  const resolve = useCallback(
+    async (hand: Card[], playerBusted = false) => {
+      setPhase("dealer");
+      let dhand = dealer.slice();
+      let ddeck = dealerDeck.slice();
     await sleep(800); // allow hidden card flip
     while (handTotal(dhand) < 17) {
       dhand.push(parseCard(ddeck.shift()!));
@@ -425,7 +428,9 @@ export default function BlackjackPage() {
     setMessage(msg);
     setPhase("result");
     setBet(0);
-  };
+    },
+    [bet, dealer, dealerDeck]
+  );
 
   useEffect(() => {
     if (
@@ -434,7 +439,7 @@ export default function BlackjackPage() {
     ) {
       resolve(player, selfStatus === "bust");
     }
-  }, [selfStatus, statuses, player]);
+  }, [player, resolve, selfStatus, statuses]);
 
   const playAgain = () => {
     setBetDelay(true);

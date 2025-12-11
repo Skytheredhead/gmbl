@@ -394,7 +394,7 @@ const RouletteGame = forwardRef<RouletteGameHandle, {
     };
 
     rafRef.current=requestAnimationFrame(step); return ()=>{ if(rafRef.current) cancelAnimationFrame(rafRef.current); };
-  },[spinning,isMobile]);
+  },[bets, drawWheel, isMobile, setWallet, sideBets, spinning]);
 
   const pulse=(id:string)=>{ const el=document.getElementById(id); if(!el) return; el.animate([{transform:'scale(1)'},{transform:'scale(1.05)'},{transform:'scale(1)'}], {duration:140,easing:'ease-out'}); };
   const applyBet=(n:number, amt:number)=>{

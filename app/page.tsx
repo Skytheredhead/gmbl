@@ -56,7 +56,7 @@ export default function GmblHome() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [code]);
+  }, [code, onJoin]);
 
   return (
     <main className="relative min-h-screen overflow-hidden px-3 pb-24 text-white sm:px-6">

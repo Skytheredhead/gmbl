@@ -878,7 +878,7 @@ export default function HoldemPage() {
       setCurrentIndex(nextIndex);
       setStatus(nextIndex === 0 ? `You're up on the ${nextPhase}.` : `${nextPhase[0].toUpperCase()}${nextPhase.slice(1)} phase.`);
     },
-    [dealCommunityCards, phase, resetBets]
+    [dealCommunityCards, finishHand, phase, resetBets]
   );
 
   const finishHand = useCallback(
@@ -1708,7 +1708,7 @@ function PokerCard({
     return () => {
       if (timer) window.clearTimeout(timer);
     };
-  }, [card?.rank, card?.suit, hidden]);
+  }, [card, hidden]);
 
   const value = card?.rank ?? "?";
   const suit = card?.suit ?? "";

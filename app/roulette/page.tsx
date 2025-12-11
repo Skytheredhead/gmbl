@@ -39,7 +39,7 @@ export default function RoulettePage() {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [wallet]);
+  }, [displayWallet, wallet]);
 
   useEffect(() => {
     const n = sessionStorage.getItem("gmbl-name") || "";
@@ -100,7 +100,7 @@ export default function RoulettePage() {
     return () => {
       ch.unsubscribe();
     };
-  }, []);
+  }, [router]);
 
   const broadcastBets = (data: { bets: any; sideBets: any }) => {
     if (!channel) return;

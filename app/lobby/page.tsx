@@ -117,7 +117,7 @@ export default function GmblLobby() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [joined, name]);
+  }, [joined, name, onJoin]);
 
   const canStart = isHost && joined && selectedGame && players.length > 1;
 
@@ -142,7 +142,7 @@ export default function GmblLobby() {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [wallet]);
+  }, [displayWallet, wallet]);
 
   return (
     <main className="relative min-h-screen overflow-hidden px-4 pb-24 pt-24 text-white sm:px-6">

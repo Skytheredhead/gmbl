@@ -97,7 +97,7 @@ export default function BaccaratPage() {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [wallet]);
+  }, [displayWallet, wallet]);
 
   const leave = () => router.push("/");
 
