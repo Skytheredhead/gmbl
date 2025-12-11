@@ -16,11 +16,11 @@ export default function GmblHome() {
 
   const canJoin = code.length === 4;
 
-  const navigate = (path: string) => {
+  const navigate = useCallback((path: string) => {
     if (typeof window !== "undefined") {
       window.location.href = path;
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!showHoldemModal) return;

@@ -860,27 +860,6 @@ export default function HoldemPage() {
     setWallet(humanStackAfter);
   }, [isHost, isMultiplayer, setConclusion, setWallet, wallet]);
 
-  const advancePhase = useCallback(
-    (playersList: PlayerState[]) => {
-      if (phase === "river") {
-        finishHand(playersList, "showdown");
-        return;
-      }
-      const nextPhase = phase === "preflop" ? "flop" : phase === "flop" ? "turn" : "river";
-      const reset = resetBets(playersList);
-      setPlayers(reset);
-      setCurrentBet(0);
-      setPot((prev) => prev);
-      setPhase(nextPhase);
-      if (nextPhase === "flop") dealCommunityCards(3);
-      else dealCommunityCards(1);
-      const nextIndex = findNextActor(reset, -1, 0);
-      setCurrentIndex(nextIndex);
-      setStatus(nextIndex === 0 ? `You're up on the ${nextPhase}.` : `${nextPhase[0].toUpperCase()}${nextPhase.slice(1)} phase.`);
-    },
-    [dealCommunityCards, finishHand, phase, resetBets]
-  );
-
   const finishHand = useCallback(
     (playersList: PlayerState[], reason: "showdown" | "fold") => {
       const activePlayers = playersList.filter((player) => !player.folded && player.cards.length === 2);
@@ -1005,6 +984,27 @@ export default function HoldemPage() {
       setConclusion({ title, detail, variant });
     },
     [community, pot, setConclusion, setHasStarted, setWallet, wallet]
+  );
+
+  const advancePhase = useCallback(
+    (playersList: PlayerState[]) => {
+      if (phase === "river") {
+        finishHand(playersList, "showdown");
+        return;
+      }
+      const nextPhase = phase === "preflop" ? "flop" : phase === "flop" ? "turn" : "river";
+      const reset = resetBets(playersList);
+      setPlayers(reset);
+      setCurrentBet(0);
+      setPot((prev) => prev);
+      setPhase(nextPhase);
+      if (nextPhase === "flop") dealCommunityCards(3);
+      else dealCommunityCards(1);
+      const nextIndex = findNextActor(reset, -1, 0);
+      setCurrentIndex(nextIndex);
+      setStatus(nextIndex === 0 ? `You're up on the ${nextPhase}.` : `${nextPhase[0].toUpperCase()}${nextPhase.slice(1)} phase.`);
+    },
+    [dealCommunityCards, finishHand, phase, resetBets]
   );
 
   const concludeIfNeeded = useCallback(

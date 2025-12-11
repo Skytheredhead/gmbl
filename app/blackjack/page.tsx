@@ -256,13 +256,16 @@ export default function BlackjackPage() {
     return () => cancelAnimationFrame(frame);
   }, [displayMoney, money]);
 
-  function broadcastHand(hand: Card[]) {
-    if (!channel) return;
-    const codes = hand.map(
-      (c) => `${c.rank}${{ "♠": "S", "♥": "H", "♦": "D", "♣": "C" }[c.suit]}`
-    );
-    channel.send({ type: "broadcast", event: "hand", payload: { name, hand: codes } });
-  }
+  const broadcastHand = useCallback(
+    (hand: Card[]) => {
+      if (!channel) return;
+      const codes = hand.map(
+        (c) => `${c.rank}${{ "♠": "S", "♥": "H", "♦": "D", "♣": "C" }[c.suit]}`
+      );
+      channel.send({ type: "broadcast", event: "hand", payload: { name, hand: codes } });
+    },
+    [channel, name]
+  );
 
   const deal = useCallback(
     (amt: number) => {

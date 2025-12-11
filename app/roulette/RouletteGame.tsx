@@ -302,7 +302,7 @@ const RouletteGame = forwardRef<RouletteGameHandle, {
     ctx.fillStyle=g; ctx.beginPath(); ctx.arc(bx,by,BALL_R,0,Math.PI*2); ctx.fill();
 
     ctx.restore();
-  },[]);
+  }, [isMobile]);
 
   // Animation loop with proper states
   useEffect(()=>{
