@@ -16,35 +16,19 @@ const suits = ["S", "H", "D", "C"];
 const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
 const suitMap: Record<string, Card["suit"]> = { S: "♠", H: "♥", D: "♦", C: "♣" };
 
-// deterministic shuffle so every player shares the same dealer cards
-function xmur3(str: string) {
-  let h = 1779033703 ^ str.length;
-  for (let i = 0; i < str.length; i++) {
-    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-    h = (h << 13) | (h >>> 19);
-  }
-  return function () {
-    h = Math.imul(h ^ (h >>> 16), 2246822507);
-    h = Math.imul(h ^ (h >>> 13), 3266489909);
-    return (h ^= h >>> 16) >>> 0;
-  };
-}
-function mulberry32(a: number) {
-  return function () {
-    let t = (a += 0x6d2b79f5);
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-function createDeck(seed: string): string[] {
+// random shuffle for deck creation
+function createDeck(): string[] {
   const deck: string[] = [];
   for (const s of suits) {
     for (const r of ranks) deck.push(`${r}${s}`);
   }
-  const rand = mulberry32(xmur3(seed)());
   for (let i = deck.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
+    // use crypto for stronger randomness when available
+    const rand =
+      typeof crypto !== "undefined" && crypto.getRandomValues
+        ? crypto.getRandomValues(new Uint32Array(1))[0] / 4294967295
+        : Math.random();
+    const j = Math.floor(rand * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
   return deck;
@@ -271,9 +255,8 @@ export default function BlackjackPage() {
     (amt: number) => {
       const nextRound = round + 1;
       setRound(nextRound);
-      const seedBase = `${code}-${nextRound}`;
-      const pDeck = createDeck(`${seedBase}-${name}`);
-      const dDeck = createDeck(`${seedBase}-dealer`);
+      const pDeck = createDeck();
+      const dDeck = createDeck();
     const ph = [parseCard(pDeck.shift()!), parseCard(pDeck.shift()!)];
     const dh = [parseCard(dDeck.shift()!), parseCard(dDeck.shift()!)];
     setPlayerDeck(pDeck);
@@ -292,7 +275,7 @@ export default function BlackjackPage() {
       });
       broadcastHand(ph);
     },
-    [broadcastHand, code, name, round]
+    [broadcastHand, round]
   );
 
   useEffect(() => {
@@ -440,12 +423,14 @@ export default function BlackjackPage() {
 
   useEffect(() => {
     if (
-      selfStatus !== "playing" &&
-      Object.values(statuses).every((s) => s !== "playing")
-    ) {
-      resolve(player, selfStatus === "bust");
-    }
-  }, [player, resolve, selfStatus, statuses]);
+      phase !== "waiting" ||
+      selfStatus === "playing" ||
+      Object.values(statuses).some((s) => s === "playing")
+    )
+      return;
+
+    resolve(player, selfStatus === "bust");
+  }, [phase, player, resolve, selfStatus, statuses]);
 
   const playAgain = () => {
     setBetDelay(true);
