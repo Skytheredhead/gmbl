@@ -196,8 +196,9 @@ const games: ReadonlyArray<GameCardConfig> = [
   {
     label: "Multiplayer",
     path: "/lobby",
-    subtext: "Create a room and invite friends",
+    subtext: "Multiplayer tables are temporarily offline",
     className: "bg-gradient-to-br from-cyan-400/25 via-emerald-400/20 to-sky-500/25",
+    disabled: true,
   },
   {
     label: "Blackjack",
